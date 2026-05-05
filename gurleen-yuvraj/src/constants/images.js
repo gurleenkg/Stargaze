@@ -1,9 +1,9 @@
-import heroLongNoseImg from '../assets/branding/hero-longnose-winnipeg.jpg';
+import heroHomepageNewImg from '../assets/branding/hero-homepage-new.jpg';
 import opsLongNoseImg from '../assets/branding/ops-longnose.jpg';
 
 export const IMAGES = {
   hero: {
-    primary: heroLongNoseImg,
+    primary: heroHomepageNewImg,
     fallback:
       'https://images.pexels.com/photos/4484077/pexels-photo-4484077.jpeg?auto=compress&cs=tinysrgb&w=1600',
   },

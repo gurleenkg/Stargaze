@@ -3,16 +3,43 @@ import { DetailDialog } from './components/DetailDialog.jsx';
 import { Reveal } from './components/Reveal.jsx';
 import { SafeImg } from './components/SafeImg.jsx';
 import { IMAGES } from './constants/images.js';
-import { EQUIPMENT } from './equipmentData.js';
 import { MODAL_HTML } from './modalHtml.js';
 import brandLogo from './assets/branding/logo_stargaze.jpeg';
+import dryVanImg from './assets/equipment/dry-van.jpg';
+import reeferImg from './assets/equipment/reefer.jpg';
+import flatbedImg from './assets/equipment/flatbed.jpg';
+import powerOnlyImg from './assets/equipment/power-only.jpg';
+import sprinterVanImg from './assets/equipment/sprinter-van.jpg';
+import ftlImg from './assets/equipment/ftl.jpg';
+import ltlImg from './assets/equipment/ltl.jpg';
 
 const TICKER = ['Dry van 53′', 'Reefer', 'Flatbed & step deck', 'Power-only', 'Expedited', 'Canada–USA'];
+const SERVICES = [
+  { title: 'Dry van (53′)', desc: 'General freight, retail, and packaged materials.', key: 'dryvan', modalTitle: 'Dry van (53′)', delay: 0, img: dryVanImg },
+  { title: 'Reefer', desc: 'Temperature-controlled food, beverage, and sensitive products.', key: 'reefer', modalTitle: 'Refrigerated (reefer)', delay: 60, img: reeferImg },
+  { title: 'Flatbed & step deck', desc: 'Oversized, construction, and industrial freight.', key: 'flatbed', modalTitle: 'Flatbed & step deck', delay: 120, img: flatbedImg },
+  { title: 'Power-only', desc: 'Drop-and-hook and trailer repositioning.', key: 'power', modalTitle: 'Power-only', delay: 40, img: powerOnlyImg },
+  { title: 'Sprinter vans & straight trucks', desc: 'Expedited and time-critical shipments.', key: 'expedited', modalTitle: 'Expedited capacity', delay: 100, img: sprinterVanImg },
+  { title: 'Full truckload (FTL)', desc: 'Dedicated trailer for one shipment with direct, faster transit.', key: 'ftl', modalTitle: 'Full truckload (FTL)', delay: 140, img: ftlImg },
+  { title: 'Less than truckload (LTL)', desc: 'Shared trailer space for palletized freight with cost-efficient moves.', key: 'ltl', modalTitle: 'Less than truckload (LTL)', delay: 180, img: ltlImg },
+];
+const INDUSTRIES = [
+  { emoji: '🥦', name: 'Food & beverage', blurb: 'Food-grade freight and temperature-sensitive loads.', key: 'food', title: 'Food & beverage' },
+  { emoji: '🧪', name: 'Chemical & ingredients', blurb: 'Non-hazardous chemicals and bulk materials.', key: 'chemical', title: 'Chemical & ingredients', delay: 50 },
+  { emoji: '🛒', name: 'Retail & consumer', blurb: 'Palletized freight and DC replenishment.', key: 'retail', title: 'Retail & consumer goods', delay: 100 },
+  { emoji: '🌾', name: 'Agriculture', blurb: 'Feed, raw materials, and seasonal freight.', key: 'ag', title: 'Agriculture & commodities', delay: 150 },
+  { emoji: '🏭', name: 'Manufacturing', blurb: 'Parts, inputs, and finished goods.', key: 'mfg', title: 'Manufacturing & industrial', delay: 200 },
+  { emoji: '⚠️', name: 'Dangerous goods (hazmat)', blurb: 'Regulated hazardous freight managed with strict compliance.', key: 'hazmat', title: 'Dangerous goods (hazmat)', delay: 40 },
+  { emoji: '💊', name: 'Pharma & healthcare', blurb: 'High-integrity freight with handling and timing controls.', key: 'pharma', title: 'Pharma & healthcare', delay: 80 },
+  { emoji: '❄️', name: 'Temperature-controlled', blurb: 'Reefer support for products requiring cold-chain stability.', key: 'reeferSector', title: 'Temperature-controlled (reefer)', delay: 120 },
+  { emoji: '🏗️', name: 'Construction materials', blurb: 'Building products, steel, and job-site bound freight.', key: 'construction', title: 'Construction and materials', delay: 160 },
+  { emoji: '⚡', name: 'Energy & industrial', blurb: 'Heavy components and project freight for energy operations.', key: 'energy', title: 'Energy and industrial', delay: 190 },
+  { emoji: '📦', name: 'LTL & partial loads', blurb: 'Smaller shipments optimized through shared-capacity networks.', key: 'ltlPartial', title: 'LTL & Partial Loads', delay: 220 },
+];
 
 export default function App() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [navScrolled, setNavScrolled] = useState(false);
-  const [equipIdx, setEquipIdx] = useState(0);
   const [dialog, setDialog] = useState(null);
   const [quoteSent, setQuoteSent] = useState(false);
   const [quoteForm, setQuoteForm] = useState({
@@ -27,8 +54,6 @@ export default function App() {
   });
   const heroRef = useRef(null);
   const heroImgRef = useRef(null);
-  const equipmentWheelLockRef = useRef(false);
-  const equipmentTouchStartRef = useRef(null);
 
   const openModal = useCallback((htmlKey, title) => {
     if (!MODAL_HTML[htmlKey]) return;
@@ -73,59 +98,6 @@ export default function App() {
       document.body.style.overflow = '';
     };
   }, [mobileOpen]);
-
-  const eq = EQUIPMENT[equipIdx];
-
-  const showNextEquipment = useCallback(() => {
-    setEquipIdx((prev) => (prev + 1) % EQUIPMENT.length);
-  }, []);
-
-  const showPrevEquipment = useCallback(() => {
-    setEquipIdx((prev) => (prev - 1 + EQUIPMENT.length) % EQUIPMENT.length);
-  }, []);
-
-  const onEquipmentWheel = useCallback(
-    (e) => {
-      e.preventDefault();
-      if (equipmentWheelLockRef.current) return;
-      equipmentWheelLockRef.current = true;
-      if (e.deltaY > 0) showNextEquipment();
-      else if (e.deltaY < 0) showPrevEquipment();
-      window.setTimeout(() => {
-        equipmentWheelLockRef.current = false;
-      }, 220);
-    },
-    [showNextEquipment, showPrevEquipment],
-  );
-
-  const onEquipmentTouchStart = useCallback((e) => {
-    const touch = e.touches[0];
-    equipmentTouchStartRef.current = touch ? { x: touch.clientX, y: touch.clientY } : null;
-  }, []);
-
-  const onEquipmentTouchEnd = useCallback(
-    (e) => {
-      const start = equipmentTouchStartRef.current;
-      const touch = e.changedTouches[0];
-      equipmentTouchStartRef.current = null;
-      if (!start || !touch) return;
-
-      const deltaX = touch.clientX - start.x;
-      const deltaY = touch.clientY - start.y;
-      const absX = Math.abs(deltaX);
-      const absY = Math.abs(deltaY);
-      const threshold = 40;
-      const horizontalDominance = 1.2;
-
-      // Ignore subtle gestures and vertical swipes; page keeps native vertical scroll.
-      if (absX < threshold) return;
-      if (absX < absY * horizontalDominance) return;
-
-      if (deltaX < 0) showNextEquipment();
-      else showPrevEquipment();
-    },
-    [showNextEquipment, showPrevEquipment],
-  );
 
   function submitQuote(e) {
     e.preventDefault();
@@ -188,7 +160,6 @@ export default function App() {
             ['#about', 'About'],
             ['#services', 'Services'],
             ['#industries', 'Industries'],
-            ['#equipment', 'Equipment'],
             ['#why', 'Why Us'],
           ].map(([href, label]) => (
             <li key={href}>
@@ -220,7 +191,7 @@ export default function App() {
       </nav>
 
       <div
-        className={`fixed left-0 right-0 top-[106px] z-[99] max-h-[min(420px,calc(100vh-106px))] flex-col gap-1 overflow-y-auto border-t border-white/10 bg-navy/98 px-[5vw] py-5 lg:hidden ${
+        className={`fixed left-[5vw] right-[5vw] top-[112px] z-[99] max-h-[min(420px,calc(100vh-120px))] flex-col gap-1 overflow-y-auto rounded-xl border border-white/15 bg-[#09142a] px-5 py-4 shadow-2xl shadow-black/35 lg:hidden ${
           mobileOpen ? 'flex' : 'hidden'
         }`}
       >
@@ -228,7 +199,6 @@ export default function App() {
           ['#about', 'About'],
           ['#services', 'Services'],
           ['#industries', 'Industries'],
-          ['#equipment', 'Equipment'],
           ['#why', 'Why Us'],
         ].map(([href, label]) => (
           <a
@@ -308,7 +278,7 @@ export default function App() {
             <div className="hidden h-9 w-px bg-white/15 sm:block" />
             <div>
               <div className="font-display text-4xl font-extrabold text-white">
-                5<span className="text-accent">+</span>
+                11<span className="text-accent">+</span>
               </div>
               <div className="mt-1 text-[0.7rem] font-medium uppercase tracking-[0.15em] text-white/45">Core sectors</div>
             </div>
@@ -328,7 +298,7 @@ export default function App() {
                 height="933"
                 loading="eager"
               />
-              <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-navy via-navy/40 to-transparent lg:from-navy lg:via-transparent" />
+              <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-navy/85 via-navy/35 to-transparent lg:from-navy/75 lg:via-transparent" />
             </div>
             <div className="absolute bottom-8 left-6 z-[3] max-w-[220px] rounded-lg border border-accent/35 bg-navy/90 p-4 backdrop-blur-sm">
               <strong className="font-display text-xl font-extrabold text-white">Winnipeg, MB</strong>
@@ -419,92 +389,23 @@ export default function App() {
           </p>
         </Reveal>
         <div className="relative grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
-          {[
-            {
-              title: 'Dry van (53′)',
-              desc: 'General freight, retail, and packaged materials.',
-              key: 'dryvan',
-              modalTitle: 'Dry van (53′)',
-              delay: 0,
-              icon: (
-                <svg className="w-7" viewBox="0 0 28 28" fill="none" stroke="#0d3b8e" strokeWidth="1.8" aria-hidden="true">
-                  <rect x="2" y="8" width="18" height="14" rx="2" />
-                  <path d="M20 12h4l3 5v5h-7V12z" />
-                  <circle cx="7" cy="22" r="2.5" />
-                  <circle cx="22" cy="22" r="2.5" />
-                </svg>
-              ),
-            },
-            {
-              title: 'Reefer',
-              desc: 'Temperature-controlled food, beverage, and sensitive products.',
-              key: 'reefer',
-              modalTitle: 'Refrigerated (reefer)',
-              delay: 60,
-              icon: (
-                <svg className="w-7" viewBox="0 0 28 28" fill="none" stroke="#0d3b8e" strokeWidth="1.8" aria-hidden="true">
-                  <rect x="2" y="8" width="18" height="14" rx="2" />
-                  <path d="M20 12h4l3 5v5h-7V12z" />
-                  <circle cx="7" cy="22" r="2.5" />
-                  <circle cx="22" cy="22" r="2.5" />
-                  <path d="M5 11 Q10 8 15 11" strokeDasharray="2 1" />
-                </svg>
-              ),
-            },
-            {
-              title: 'Flatbed & step deck',
-              desc: 'Oversized, construction, and industrial freight.',
-              key: 'flatbed',
-              modalTitle: 'Flatbed & step deck',
-              delay: 120,
-              icon: (
-                <svg className="w-7" viewBox="0 0 28 28" fill="none" stroke="#0d3b8e" strokeWidth="1.8" aria-hidden="true">
-                  <path d="M2 16 H22" />
-                  <path d="M22 12 H26 L27 16 H22" />
-                  <circle cx="7" cy="16" r="3" />
-                  <circle cx="22" cy="16" r="3" />
-                  <rect x="4" y="8" width="16" height="8" rx="1" />
-                </svg>
-              ),
-            },
-            {
-              title: 'Power-only',
-              desc: 'Drop-and-hook and trailer repositioning.',
-              key: 'power',
-              modalTitle: 'Power-only',
-              delay: 40,
-              icon: (
-                <svg className="w-7" viewBox="0 0 28 28" fill="none" stroke="#0d3b8e" strokeWidth="1.8" aria-hidden="true">
-                  <rect x="2" y="10" width="12" height="10" rx="2" />
-                  <rect x="15" y="10" width="12" height="10" rx="2" />
-                  <circle cx="6" cy="22" r="2" />
-                  <circle cx="21" cy="22" r="2" />
-                </svg>
-              ),
-            },
-            {
-              title: 'Sprinter vans & straight trucks',
-              desc: 'Expedited and time-critical shipments.',
-              key: 'expedited',
-              modalTitle: 'Expedited capacity',
-              delay: 100,
-              wide: true,
-              icon: (
-                <svg className="w-7" viewBox="0 0 28 28" fill="none" stroke="#0d3b8e" strokeWidth="1.8" aria-hidden="true">
-                  <path d="M4 14 C4 8 10 4 16 6 L24 10 L20 18 L12 22 C6 20 4 18 4 14Z" />
-                  <circle cx="16" cy="13" r="3" />
-                </svg>
-              ),
-            },
-          ].map((s) => (
+          {SERVICES.map((s) => (
             <Reveal
               key={s.key}
               delay={s.delay}
-              className={`group relative overflow-hidden rounded-xl border border-navy/10 bg-white p-8 shadow-md shadow-navy/5 ring-1 ring-navy/5 transition-all duration-500 hover:-translate-y-1 hover:border-accent/40 hover:shadow-lg hover:shadow-blue/15 hover:ring-accent/20 ${s.wide ? 'sm:col-span-2 xl:col-span-1' : ''}`}
+              className="group relative overflow-hidden rounded-xl border border-navy/10 bg-white p-5 shadow-md shadow-navy/5 ring-1 ring-navy/5 transition-all duration-500 hover:-translate-y-1 hover:border-accent/40 hover:shadow-lg hover:shadow-blue/15 hover:ring-accent/20"
             >
-              <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-blue via-blue-mid to-accent opacity-90" />
-              <div className="mb-5 flex h-14 w-14 items-center justify-center rounded-xl bg-gradient-to-br from-blue/15 via-white to-accent/15 shadow-inner ring-1 ring-blue/10 transition group-hover:from-blue/25 group-hover:ring-accent/25">
-                {s.icon}
+              <div className="relative mb-4 overflow-hidden rounded-lg">
+                <SafeImg
+                  primary={s.img}
+                  fallback={s.img}
+                  alt={`${s.title} service`}
+                  className="aspect-[16/9] w-full object-cover transition duration-500 group-hover:scale-[1.04]"
+                  width="800"
+                  height="450"
+                  loading="lazy"
+                />
+                <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-navy/50 to-transparent" />
               </div>
               <h3 className="font-display text-xl font-extrabold text-navy">{s.title}</h3>
               <p className="mt-2 text-sm font-medium leading-relaxed text-slate-600">{s.desc}</p>
@@ -540,18 +441,12 @@ export default function App() {
             Tap a card for the detailed scope we support in each vertical.
           </p>
         </Reveal>
-        <div className="relative z-[2] grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
-          {[
-            { emoji: '🥦', name: 'Food & beverage', blurb: 'Food-grade freight & temperature-sensitive loads.', key: 'food', title: 'Food & beverage' },
-            { emoji: '🧪', name: 'Chemical & ingredients', blurb: 'Non-hazardous chemicals & bulk materials.', key: 'chemical', title: 'Chemical & ingredients', delay: 50 },
-            { emoji: '🛒', name: 'Retail & consumer', blurb: 'Palletized freight & DC replenishment.', key: 'retail', title: 'Retail & consumer goods', delay: 100 },
-            { emoji: '🌾', name: 'Agriculture', blurb: 'Feed, raw materials, seasonal freight.', key: 'ag', title: 'Agriculture & commodities', delay: 150 },
-            { emoji: '🏭', name: 'Manufacturing', blurb: 'Parts, inputs, and finished goods.', key: 'mfg', title: 'Manufacturing & industrial', delay: 200, wide: true },
-          ].map((ind) => (
+        <div className="relative z-[2] grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          {INDUSTRIES.map((ind) => (
             <Reveal
               key={ind.key}
               delay={ind.delay ?? 0}
-              className={`cursor-pointer rounded-xl border border-white/10 bg-white/5 p-6 transition hover:-translate-y-1 hover:border-accent hover:bg-white/10 ${ind.wide ? 'sm:col-span-2 lg:col-span-1' : ''}`}
+              className="cursor-pointer rounded-xl border border-white/10 bg-white/5 p-6 transition hover:-translate-y-1 hover:border-accent hover:bg-white/10"
             >
               <div
                 role="button"
@@ -591,80 +486,6 @@ export default function App() {
           ))}
         </Reveal>
       </div>
-
-      <section id="equipment" className="px-[5vw] py-24">
-        <div className="grid items-center gap-14 lg:grid-cols-[1fr_1.25fr]">
-          <div>
-            <Reveal>
-              <p className="mb-3 text-xs font-bold uppercase tracking-[0.2em] text-accent">Equipment capabilities</p>
-              <h2 className="font-display text-[clamp(2rem,4vw,2.85rem)] font-extrabold tracking-tight text-navy">
-                The right trailer for the job
-              </h2>
-              <p className="mt-4 text-base font-light leading-relaxed text-slate-500">
-                Select a line — imagery and copy update to match your equipment focus.
-              </p>
-            </Reveal>
-            <div className="mt-8 space-y-0 border-y border-slate-200">
-              {EQUIPMENT.map((item, i) => (
-                <button
-                  key={item.num}
-                  type="button"
-                  className={`flex w-full items-center gap-4 border-b border-slate-200 py-5 text-left transition last:border-b-0 hover:text-blue-mid ${i === equipIdx ? 'bg-slate-50' : ''}`}
-                  onClick={() => setEquipIdx(i)}
-                >
-                  <span className="font-display text-xs font-bold tracking-wider text-accent">{item.num}</span>
-                  <div className="min-w-0 flex-1">
-                    <div className="font-display text-lg font-bold text-navy">{item.title}</div>
-                    <div className="text-sm text-slate-500">
-                      {item.sub.includes(' — ') ? item.sub.split(' — ')[0] : item.sub}
-                    </div>
-                  </div>
-                  <span className="text-slate-400" aria-hidden="true">
-                    →
-                  </span>
-                </button>
-              ))}
-            </div>
-          </div>
-          <Reveal delay={100}>
-            <div
-              className="overflow-hidden rounded-xl shadow-xl ring-1 ring-navy/10 touch-pan-y"
-              onWheel={onEquipmentWheel}
-              onTouchStart={onEquipmentTouchStart}
-              onTouchEnd={onEquipmentTouchEnd}
-            >
-              <img
-                key={`${equipIdx}-${eq.num}`}
-                src={eq.img}
-                alt={`${eq.title} — freight equipment`}
-                className="aspect-video w-full object-cover"
-                width="900"
-                height="506"
-                loading="lazy"
-                decoding="async"
-              />
-            </div>
-            <div className="relative mt-5 overflow-hidden rounded-xl bg-gradient-to-br from-navy to-[#0f2d6b] p-9 text-white shadow-lg">
-              <span className="pointer-events-none absolute right-6 top-4 font-display text-8xl font-black text-white/[0.07]">
-                {eq.num}
-              </span>
-              <h3 className="relative font-display text-2xl font-extrabold">{eq.title}</h3>
-              <p className="relative mt-3 max-w-prose text-sm leading-relaxed text-white/55">{eq.sub}</p>
-              <div className="relative mt-6 flex gap-2">
-                {EQUIPMENT.map((_, i) => (
-                  <button
-                    key={_.num}
-                    type="button"
-                    className={`h-2 transition-all ${i === equipIdx ? 'w-6 rounded-sm bg-accent' : 'w-2 rounded-full bg-white/25'}`}
-                    aria-label={`Show ${_.title}`}
-                    onClick={() => setEquipIdx(i)}
-                  />
-                ))}
-              </div>
-            </div>
-          </Reveal>
-        </div>
-      </section>
 
       <section id="why" className="bg-blue px-[5vw] py-24 text-white">
         <Reveal className="mb-12">
@@ -711,7 +532,6 @@ export default function App() {
             <Reveal delay={100} className="mt-10 space-y-6">
               {[
                 ['📞', 'Phone', <a key="p" href="tel:+12045001481" className="mt-0.5 block font-medium text-white hover:text-accent">+1 204-500-1481</a>],
-                ['📱', 'Cell', <a key="c" href="tel:+16476178671" className="mt-0.5 block font-medium text-white hover:text-accent">+1 647-617-8671</a>],
                 [
                   '✉️',
                   'Email',
@@ -817,6 +637,8 @@ export default function App() {
                     <option>Reefer</option>
                     <option>Flatbed / step deck</option>
                     <option>Power-only</option>
+                    <option>FTL</option>
+                    <option>LTL / Partial</option>
                     <option>Expedited</option>
                     <option>Cross-border</option>
                   </select>

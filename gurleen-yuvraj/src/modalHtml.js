@@ -27,6 +27,30 @@ export const MODAL_HTML = {
 <p class="font-semibold text-navy mb-2">Manufacturing &amp; industrial</p>
 <ul class="list-disc pl-5 space-y-1"><li>Parts, raw inputs, and finished goods</li><li>Movement between facilities and end users</li></ul>`,
 
+  hazmat: `
+<p class="font-semibold text-navy mb-2">Dangerous goods (hazmat)</p>
+<ul class="list-disc pl-5 space-y-1"><li>Regulated hazardous materials requiring compliant handling and documentation</li><li>Coordinated routing and carrier controls to reduce risk</li></ul>`,
+
+  pharma: `
+<p class="font-semibold text-navy mb-2">Pharma &amp; healthcare</p>
+<ul class="list-disc pl-5 space-y-1"><li>Medical and pharmaceutical freight with strict timing and integrity requirements</li><li>Process-focused visibility for critical healthcare supply moves</li></ul>`,
+
+  reeferSector: `
+<p class="font-semibold text-navy mb-2">Temperature-controlled (reefer)</p>
+<ul class="list-disc pl-5 space-y-1"><li>Cold-chain freight for products that must remain within specified temperature ranges</li><li>Monitored transit for food, healthcare, and sensitive commodities</li></ul>`,
+
+  construction: `
+<p class="font-semibold text-navy mb-2">Construction and materials</p>
+<ul class="list-disc pl-5 space-y-1"><li>Steel, lumber, and project materials for site and distribution delivery</li><li>Capacity planning for heavy and oversized building freight</li></ul>`,
+
+  energy: `
+<p class="font-semibold text-navy mb-2">Energy and industrial</p>
+<ul class="list-disc pl-5 space-y-1"><li>Components, equipment, and supplies supporting energy operations</li><li>Reliable scheduling for project-driven industrial freight</li></ul>`,
+
+  ltlPartial: `
+<p class="font-semibold text-navy mb-2">LTL &amp; Partial Loads</p>
+<ul class="list-disc pl-5 space-y-1"><li>Shared-capacity shipping for smaller palletized shipments</li><li>Cost-efficient moves when freight does not require a full trailer</li></ul>`,
+
   dryvan: `
 <p class="mb-2">Dry vans (53′) handle general freight, retail goods, and packaged materials — ideal for standard palletized loads across North America.</p>
 <p class="text-sm text-slate-600">Versatile capacity for everyday shipper needs with planning and tracking through each move.</p>`,
@@ -45,4 +69,12 @@ export const MODAL_HTML = {
   expedited: `
 <p class="mb-2">Sprinter vans and straight trucks cover expedited and time-critical shipments when delivery windows are tight.</p>
 <p class="text-sm text-slate-600">Useful for smaller footprint freight or urgent lane coverage alongside full trailer solutions.</p>`,
+
+  ftl: `
+<p class="mb-2">Full truckload (FTL) assigns an entire trailer to one shipper for direct transit from pickup to delivery.</p>
+<p class="text-sm text-slate-600">Best fit for high-volume, high-value, or time-sensitive freight that benefits from minimal handling.</p>`,
+
+  ltl: `
+<p class="mb-2">Less than truckload (LTL) combines smaller shipments from multiple shippers into shared trailer space.</p>
+<p class="text-sm text-slate-600">A cost-efficient option for palletized freight that does not need full trailer capacity.</p>`,
 };
